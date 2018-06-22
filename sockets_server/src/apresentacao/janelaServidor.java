@@ -24,17 +24,17 @@ import modelo.Servidor;
  */
 public class janelaServidor extends javax.swing.JFrame {
 
-    
     //DatagramSocket serverSocket;
     //byte[] receiveData = new byte[1024];
     //byte[] sendData = new byte[1024];
     public static List<Cliente> clientes = new ArrayList();
     List<Lote> lotes = new ArrayList();
+
     /**
      * Creates new form janelaServidor
      */
     public janelaServidor() throws SocketException, IOException {
-       // this.serverSocket = new DatagramSocket(10001);
+        // this.serverSocket = new DatagramSocket(10001);
         initComponents();
         for (int i = 1; i < 5; i++) {
             Lote lote = new Lote();
@@ -42,7 +42,7 @@ public class janelaServidor extends javax.swing.JFrame {
             lote.minimo = Double.parseDouble(JOptionPane.showInputDialog("valor minimo: "));
             lotes.add(lote);
         }
-        
+
         System.out.println("antes");
         Servidor servidor = new Servidor();
         System.out.println("depois");
@@ -108,74 +108,71 @@ public class janelaServidor extends javax.swing.JFrame {
         byte[] sendData;
         String lote;
         DatagramPacket sendPacket;
-        
+
         for (int i = 0; i < lotes.size(); i++) {
             for (int j = 0; j < clientes.size(); j++) {
                 receiveData = new byte[1024];
-                sendData = new byte[1024];  
-                lote = lotes.get(i).descricao + "-" +lotes.get(i).minimo;  
+                sendData = new byte[1024];
+                lote = lotes.get(i).descricao + "-" + lotes.get(i).minimo;
                 sendData = lote.getBytes();
-                sendPacket =
-                  new DatagramPacket(sendData, sendData.length, clientes.get(j).ip, clientes.get(j).porta);
-                try {    
+                sendPacket
+                        = new DatagramPacket(sendData, sendData.length, clientes.get(j).ip, clientes.get(j).porta);
+                try {
                     serverSocket.send(sendPacket);
                 } catch (IOException ex) {
                     Logger.getLogger(janelaServidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 try {
                     serverSocket.receive(receivePacket);
                 } catch (IOException ex) {
                     Logger.getLogger(janelaServidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
                 double lance = Double.parseDouble(new String(receivePacket.getData()));
-                if (lance >= lotes.get(i).minimo && lance > lotes.get(i).vencedor)  {
+                if (lance >= lotes.get(i).minimo && lance > lotes.get(i).vencedor) {
                     lotes.get(i).cliente = clientes.get(j);
                     lotes.get(i).vencedor = lance;
-                    
+
                 }
             }
-            
-            lote = "Lance ganhador: R$" + lotes.get(i).vencedor + " dado por: " + lotes.get(i).cliente.usuario;  
+            if (lotes.get(i).cliente == null) {
+                lote = "Nenhum lance arrematou o lote";
+            } else {
+                lote = "Lance ganhador: R$" + lotes.get(i).vencedor + " dado por: " + lotes.get(i).cliente.usuario;
+            }
             sendData = new byte[1024];
             sendData = lote.getBytes();
             for (int j = 0; j < clientes.size(); j++) {
                 sendPacket = new DatagramPacket(sendData, sendData.length, clientes.get(j).ip, clientes.get(j).porta);
-                try {    
+                try {
                     serverSocket.send(sendPacket);
                 } catch (IOException ex) {
                     Logger.getLogger(janelaServidor.class.getName()).log(Level.SEVERE, null, ex);
-                }    
-            
-                
+                    this.dispose();
+                }
+
             }
-            
-            
-            
-            
+
         }
-        
-          lote = "Fim do Leilao";  
-          sendData = new byte[1024];
-          sendData = lote.getBytes();
-          for (int j = 0; j < clientes.size(); j++) {
-                sendPacket = new DatagramPacket(sendData, sendData.length, clientes.get(j).ip, clientes.get(j).porta);
-                try {    
-                    serverSocket.send(sendPacket);
-                } catch (IOException ex) {
-                    Logger.getLogger(janelaServidor.class.getName()).log(Level.SEVERE, null, ex);
-                }    
-            
-                
-          }
-            
-            
-        
+
+        lote = "Fim do Leilao";
+        sendData = new byte[1024];
+        sendData = lote.getBytes();
+        for (int j = 0; j < clientes.size(); j++) {
+            sendPacket = new DatagramPacket(sendData, sendData.length, clientes.get(j).ip, clientes.get(j).porta);
+            try {
+                serverSocket.send(sendPacket);
+            } catch (IOException ex) {
+                Logger.getLogger(janelaServidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
         double total = 0;
         for (int i = 0; i < lotes.size(); i++) {
             total = total + lotes.get(i).vencedor;
-            
+
         }
         JOptionPane.showMessageDialog(this, "Valor total arrecadado = " + total);
         this.dispose();
@@ -216,12 +213,10 @@ public class janelaServidor extends javax.swing.JFrame {
                 } catch (IOException ex) {
                     Logger.getLogger(janelaServidor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               
-                
+
             }
         });
-        
-        
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -230,10 +225,9 @@ public class janelaServidor extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
  private void carregarListagem() {
         this.listaClientes.removeAll();
-            for (int i = 0; i < clientes.size(); i++) {
-                this.listaClientes.add("cliente: " + clientes.get(i).usuario);                
-            }
+        for (int i = 0; i < clientes.size(); i++) {
+            this.listaClientes.add("cliente: " + clientes.get(i).usuario);
+        }
     }
-
 
 }

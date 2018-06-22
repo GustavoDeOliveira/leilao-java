@@ -16,4 +16,11 @@ public class Cliente {
     public int porta;
     public InetAddress ip;
     
+    public Cliente(String usuario, int porta, InetAddress ip) {
+        this.usuario = usuario;
+        this.porta = porta;
+        this.ip = ip;
+    }
+    
+    public Cliente(){}
 }

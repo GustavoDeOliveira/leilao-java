@@ -16,43 +16,42 @@ import java.net.SocketException;
  * @author Israel Risso
  */
 public class Servidor {
-    
-     DatagramSocket serverSocket;
-         byte[] receiveData;
-         byte[] sendData;
-     public static void main(String args[]) throws Exception
-      {
-        
-         
-         
-        
-      }
+
+    DatagramSocket serverSocket;
+    byte[] receiveData;
+    byte[] sendData;
 
     public Servidor() throws SocketException, IOException {
-         serverSocket = new DatagramSocket(10000);
-         
-        
+        serverSocket = new DatagramSocket(10000);
 
-        for (int i = 0; i < 2; i++)
-               {  receiveData = new byte[1024];
-                  sendData = new byte[1024];
-                  DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                  serverSocket.receive(receivePacket);
-                  Cliente cliente = new Cliente();
-                  cliente.usuario = new String( receivePacket.getData());
-                  cliente.ip = receivePacket.getAddress();
-                  cliente.porta = receivePacket.getPort();                 
-                  clientes.add(cliente);
-                  String resp = "conectou";
-                  
-                  sendData = resp.getBytes();
-                  DatagramPacket sendPacket =
-                  new DatagramPacket(sendData, sendData.length, cliente.ip, cliente.porta);
-                  serverSocket.send(sendPacket);
-               }
-        
-               serverSocket.close();
-        
-        
+        while (true) {
+            receiveData = new byte[1024];
+            sendData = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            serverSocket.receive(receivePacket);
+            
+            String pacote = new String(receivePacket.getData()).trim();
+            
+            Cliente cliente;
+            String resp;
+            
+            System.out.println("'" + pacote + "'");
+            cliente = new Cliente(pacote, receivePacket.getPort(), receivePacket.getAddress());
+            if (clientes.size() > 1 && pacote.equalsIgnoreCase("inicia")) break;
+            else if (pacote.equalsIgnoreCase("inicia")) {
+                resp = "sai daqui";
+            } else {
+                clientes.add(cliente);
+                resp = "conectou";
+            }
+            
+            sendData = resp.getBytes();
+            DatagramPacket sendPacket
+                    = new DatagramPacket(sendData, sendData.length, cliente.ip, cliente.porta);
+            serverSocket.send(sendPacket);
+        }
+
+        serverSocket.close();
+
     }
 }
