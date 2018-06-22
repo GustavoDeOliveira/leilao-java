@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-
 /**
  *
  * @author Israel Risso
@@ -22,8 +21,7 @@ public class janelaCliente extends javax.swing.JFrame {
     InetAddress IPAddress;
     byte[] sendData = new byte[1024];
     byte[] receiveData = new byte[1024];
-    
-    
+
     /**
      * Creates new form janelaCliente
      */
@@ -31,24 +29,27 @@ public class janelaCliente extends javax.swing.JFrame {
         this.IPAddress = InetAddress.getByName("localhost");
         this.clientSocket = new DatagramSocket();
         initComponents();
-        
-        
-      String usuario =  JOptionPane.showInputDialog("usuario");
-      this.titulo.setText(usuario);
-      
-      sendData = usuario.getBytes();
-      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 10000);
-      clientSocket.send(sendPacket);
-      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-      clientSocket.receive(receivePacket);
-      String modifiedSentence = new String(receivePacket.getData());
-      this.tela.add("entrou no leilao");
-      this.tela.add(modifiedSentence);
-      
-      clientSocket.receive(receivePacket);
-      modifiedSentence = new String(receivePacket.getData());
-      this.tela.add(modifiedSentence);
-    }
+
+        String usuario = JOptionPane.showInputDialog("usuario");
+        this.titulo.setText(usuario);
+
+        sendData = usuario.getBytes();
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 10000);
+        clientSocket.send(sendPacket);
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(receivePacket);
+        String pacote = new String(receivePacket.getData()).trim();
+        System.out.println("'" + pacote + "'");
+        if (pacote.equalsIgnoreCase("sai daqui")) {
+            System.exit(0);
+        }
+        this.tela.add("entrou no leilao");
+        this.tela.add(pacote);
+
+        clientSocket.receive(receivePacket);
+        pacote = new String(receivePacket.getData());
+        this.tela.add(pacote);
+    }// TODO add your handling code here:
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -63,6 +64,8 @@ public class janelaCliente extends javax.swing.JFrame {
         valor = new javax.swing.JTextField();
         botaoEnviar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        usuario = new javax.swing.JLabel();
         titulo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -76,84 +79,105 @@ public class janelaCliente extends javax.swing.JFrame {
 
         jLabel1.setText("Lance");
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        usuario.setText("Bem Vindo,");
+
+        titulo.setText("[Usuário]");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(usuario)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(usuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 12, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(tela, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(jLabel1)
-                                .addGap(16, 16, 16)
-                                .addComponent(valor, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(botaoEnviar))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(179, 179, 179)
-                                .addComponent(titulo)))
-                        .addGap(0, 162, Short.MAX_VALUE)))
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(valor, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 164, Short.MAX_VALUE)
+                        .addComponent(botaoEnviar))
+                    .addComponent(tela, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(titulo)
-                .addGap(18, 18, 18)
-                .addComponent(tela, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(58, 58, 58)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tela, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(valor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoEnviar)
                     .addComponent(jLabel1))
-                .addContainerGap(102, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEnviarActionPerformed
-      this.botaoEnviar.setEnabled(false);
-      sendData = new byte[1024];
-      sendData = this.valor.getText().getBytes();
-      this.valor.setEditable(false);
-      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 10000);
+        this.botaoEnviar.setEnabled(false);
+        sendData = new byte[1024];
+        sendData = this.valor.getText().getBytes();
+        this.valor.setEditable(false);
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 10000);
         try {
             clientSocket.send(sendPacket);
         } catch (IOException ex) {
             Logger.getLogger(janelaCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
         receiveData = new byte[1024];
-      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         try {
             clientSocket.receive(receivePacket);
         } catch (IOException ex) {
             Logger.getLogger(janelaCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
-      String modifiedSentence = new String(receivePacket.getData());
-      this.tela.add(modifiedSentence);
-      this.valor.setEditable(true);
-      this.valor.setText("");
-      this.botaoEnviar.setEnabled(true);
-      receiveData = new byte[1024];
-      receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        String modifiedSentence = new String(receivePacket.getData());
+        this.tela.add(modifiedSentence);
+        this.valor.setEditable(true);
+        this.valor.setText("");
+        this.botaoEnviar.setEnabled(true);
+        receiveData = new byte[1024];
+        receivePacket = new DatagramPacket(receiveData, receiveData.length);
         try {
             clientSocket.receive(receivePacket);
         } catch (IOException ex) {
             Logger.getLogger(janelaCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
-      modifiedSentence = new String(receivePacket.getData());
-      if(modifiedSentence.equals("Fim do Leilao")){
-          JOptionPane.showMessageDialog(null, "Fim do leilao!!!");
-          this.dispose();
-      }
-      this.tela.add(modifiedSentence);
+        modifiedSentence = new String(receivePacket.getData()).trim();
+        if (modifiedSentence.equals("Fim do Leilao")) {
+            JOptionPane.showMessageDialog(null, "Fim do leilao!!!");
+            this.valor.setEditable(false);
+            this.botaoEnviar.setEnabled(false);
+        }
+        this.tela.add(modifiedSentence);
     }//GEN-LAST:event_botaoEnviarActionPerformed
 
     /**
@@ -202,8 +226,10 @@ public class janelaCliente extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botaoEnviar;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private java.awt.List tela;
     private javax.swing.JLabel titulo;
+    private javax.swing.JLabel usuario;
     private javax.swing.JTextField valor;
     // End of variables declaration//GEN-END:variables
 }
