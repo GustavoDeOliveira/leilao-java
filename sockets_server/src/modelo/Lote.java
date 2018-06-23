@@ -11,7 +11,7 @@ package modelo;
  */
 public class Lote {
     public String descricao;
-    public double minimo;
-    public double vencedor = 0;
+    public double minimo = 0.0;
+    public double vencedor = 0.0;
     public Cliente cliente;
 }

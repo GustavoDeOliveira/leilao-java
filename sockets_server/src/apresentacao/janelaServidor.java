@@ -36,16 +36,36 @@ public class janelaServidor extends javax.swing.JFrame {
     public janelaServidor() throws SocketException, IOException {
         // this.serverSocket = new DatagramSocket(10001);
         initComponents();
-        for (int i = 1; i < 5; i++) {
+        loopCadastro:
+        for (int i = 1; true; i++) {
             Lote lote = new Lote();
-            lote.descricao = JOptionPane.showInputDialog("descricao lote " + i);
-            lote.minimo = Double.parseDouble(JOptionPane.showInputDialog("valor minimo: "));
+            while(lote.descricao == null || lote.descricao.isEmpty()) {
+                lote.descricao = JOptionPane.showInputDialog("Descrição do " + i + "º lote");
+                if (lote.descricao == null) {
+                    if (lotes.size() < 2) System.exit(0);
+                    else {
+                        break loopCadastro;
+                    }
+                }
+            }
+            while(lote.minimo <= 0.0) {
+                try {
+                    String input = JOptionPane.showInputDialog("Valor mínimo do lote '" + lote.descricao + "': ");
+                    if (input == null) {
+                        if (i < 2) System.exit(0);
+                        else {
+                            break loopCadastro;
+                        }
+                    }
+                    lote.minimo = Double.parseDouble(input);
+                } catch(NumberFormatException ex) {
+                    lote.minimo = -1.0;
+                }
+            }
             lotes.add(lote);
         }
 
-        System.out.println("antes");
         Servidor servidor = new Servidor();
-        System.out.println("depois");
         carregarListagem();
     }
 
@@ -70,27 +90,29 @@ public class janelaServidor extends javax.swing.JFrame {
             }
         });
 
+        listaClientes.setBackground(new java.awt.Color(255, 255, 255));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(162, 162, 162)
-                .addComponent(botaoIniciar)
+                .addContainerGap()
+                .addComponent(listaClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(107, Short.MAX_VALUE)
-                .addComponent(listaClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(98, 98, 98))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(botaoIniciar)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(46, 46, 46)
+                .addContainerGap()
                 .addComponent(listaClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(botaoIniciar)
-                .addGap(62, 62, 62))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -113,7 +135,7 @@ public class janelaServidor extends javax.swing.JFrame {
             for (int j = 0; j < clientes.size(); j++) {
                 receiveData = new byte[1024];
                 sendData = new byte[1024];
-                lote = lotes.get(i).descricao + "-" + lotes.get(i).minimo;
+                lote = "LOTE ATUAL: " + lotes.get(i).descricao + ", Lance mínimo: R$" + lotes.get(i).minimo;
                 sendData = lote.getBytes();
                 sendPacket
                         = new DatagramPacket(sendData, sendData.length, clientes.get(j).ip, clientes.get(j).porta);
