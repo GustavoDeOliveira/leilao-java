@@ -26,14 +26,30 @@ public class janelaCliente extends javax.swing.JFrame {
      * Creates new form janelaCliente
      */
     public janelaCliente() throws SocketException, UnknownHostException, IOException {
-        this.IPAddress = InetAddress.getByName("localhost");
+        String endereco = JOptionPane.showInputDialog("Endereço do servidor (deixe vazio para localhost): ");
+        if (endereco == null) System.exit(0);
+        if (endereco.isEmpty()) {
+            this.IPAddress = InetAddress.getByName("localhost");
+        } else {
+            try {
+                this.IPAddress = InetAddress.getByName(endereco);
+            } catch(UnknownHostException ex) {
+                JOptionPane.showMessageDialog(null, "Host desconhecido.");
+                System.exit(0);
+            }
+        }
+        
         this.clientSocket = new DatagramSocket();
         initComponents();
+        
+        String login = "";
+        while(login.isEmpty()) {
+            login = JOptionPane.showInputDialog("usuario");
+            if (login == null) System.exit(0);
+        }
+        this.titulo.setText(login);
 
-        String usuario = JOptionPane.showInputDialog("usuario");
-        this.titulo.setText(usuario);
-
-        sendData = usuario.getBytes();
+        sendData = login.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 10000);
         clientSocket.send(sendPacket);
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -41,6 +57,7 @@ public class janelaCliente extends javax.swing.JFrame {
         String pacote = new String(receivePacket.getData()).trim();
         System.out.println("'" + pacote + "'");
         if (pacote.equalsIgnoreCase("sai daqui")) {
+            JOptionPane.showMessageDialog(null, "O leilão não poder ser iniciado agora.");
             System.exit(0);
         }
         this.tela.add("entrou no leilao");
@@ -142,6 +159,12 @@ public class janelaCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEnviarActionPerformed
+        if (this.valor.getText() == null || this.valor.getText().isEmpty()) return;
+        try {
+            Double.parseDouble(this.valor.getText());
+        } catch(NumberFormatException ex) {
+            return;
+        }
         this.botaoEnviar.setEnabled(false);
         sendData = new byte[1024];
         sendData = this.valor.getText().getBytes();
